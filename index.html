@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>E-Library Premium</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+    <div id="loadingScreen" class="loading-screen">
+        <svg xmlns="http://www.w3.org/2000/svg" height="200px" width="200px" viewBox="0 0 200 200" class="pencil">
+            <defs>
+                <clipPath id="pencil-eraser"><rect height="30" width="30" ry="5" rx="5"></rect></clipPath>
+            </defs>
+            <circle transform="rotate(-113,100,100)" stroke-linecap="round" stroke-dashoffset="439.82" stroke-dasharray="439.82 439.82" stroke-width="2" stroke="currentColor" fill="none" r="70" class="pencil__stroke"></circle>
+            <g transform="translate(100,100)" class="pencil__rotate">
+                <g fill="none">
+                    <circle transform="rotate(-90)" stroke-dashoffset="402" stroke-dasharray="402.12 402.12" stroke-width="30" stroke="hsl(223,90%,50%)" r="64" class="pencil__body1"></circle>
+                    <circle transform="rotate(-90)" stroke-dashoffset="465" stroke-dasharray="464.96 464.96" stroke-width="10" stroke="hsl(223,90%,60%)" r="74" class="pencil__body2"></circle>
+                    <circle transform="rotate(-90)" stroke-dashoffset="339" stroke-dasharray="339.29 339.29" stroke-width="10" stroke="hsl(223,90%,40%)" r="54" class="pencil__body3"></circle>
+                </g>
+                <g transform="rotate(-90) translate(49,0)" class="pencil__eraser">
+                    <g class="pencil__eraser-skew">
+                        <rect height="30" width="30" ry="5" rx="5" fill="hsl(223,90%,70%)"></rect>
+                        <rect clip-path="url(#pencil-eraser)" height="30" width="5" fill="hsl(223,90%,60%)"></rect>
+                        <rect height="20" width="30" fill="hsl(223,10%,90%)"></rect>
+                        <rect height="20" width="15" fill="hsl(223,10%,70%)"></rect>
+                        <rect height="20" width="5" fill="hsl(223,10%,80%)"></rect>
+                    </g>
+                </g>
+                <g transform="rotate(-90) translate(49,-30)" class="pencil__point">
+                    <polygon points="15 0,30 30,0 30" fill="hsl(33,90%,70%)"></polygon>
+                    <polygon points="15 0,6 30,0 30" fill="hsl(33,90%,50%)"></polygon>
+                    <polygon points="15 0,20 10,10 10" fill="hsl(223,10%,10%)"></polygon>
+                </g>
+            </g>
+        </svg>
+    </div>
+
+    <div class="login-page" id="authInterface">
+        <div class="login-box" id="loginPage">
+            <div style="text-align: center; margin-bottom: 2rem;">
+                <i class="fas fa-book-open" style="font-size: 3rem; color: #1e40af; margin-bottom: 1rem;"></i>
+                <h1 style="color: #0f172a; font-size: 1.8rem;">Jendela Dunia</h1>
+                <p style="color: #64748b; font-size: 0.9rem; margin-top: 0.5rem;">Silakan masuk untuk mengakses koleksi kami.</p>
+            </div>
+            
+            <form id="authForm">
+                <div class="input-group" id="usernameGroup" style="display: none;">
+                    <i class="fas fa-user"></i>
+                    <input type="text" id="username" placeholder="Username / Nama Panggilan">
+                </div>
+                <div class="input-group">
+                    <i class="fas fa-envelope"></i>
+                    <input type="email" id="email" placeholder="Alamat Email" required>
+                </div>
+                <div class="input-group">
+                    <i class="fas fa-lock"></i>
+                    <input type="password" id="password" placeholder="Password (Min. 6 Karakter)" required>
+                </div>
+                <button type="submit" id="authSubmitBtn" class="btn-submit" style="padding: 1rem; font-size: 1.1rem;">Masuk Sekarang</button>
+                <div style="text-align: center; margin-top: 1.5rem; font-size: 0.9rem; color: #64748b;">
+                    <span id="authToggleText">Belum punya akun?</span> 
+                    <a href="#" id="authToggleLink" style="color: #1e40af; font-weight: 600; text-decoration: none;">Register di sini</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="mainAppInterface" style="display: none;">
+        
+        <nav class="navbar">
+            <div class="logo">
+                <i class="fas fa-book-open"></i>
+                <span>Jendela Dunia</span>
+            </div>
+            <div class="search-container">
+                <i class="fas fa-search"></i>
+                <input type="text" id="searchInput" placeholder="Cari judul atau penulis...">
+            </div>
+           <ul class="nav-links">
+                <li><a href="#" id="navBeranda" class="active">Beranda</a></li>
+                <li><a href="#" id="navKatalog">Katalog</a></li>
+                <li id="userNav" style="display: none;"><a href="#" id="navBukuSaya">Buku Saya</a></li>
+                <li id="cartNav" style="display: none;"><a href="#" id="navKeranjang" style="color: #10b981; font-weight: bold;"><i class="fas fa-shopping-cart"></i> Keranjang <span id="cartBadge">(0)</span></a></li>
+                <li><a href="#" id="navGame"><i class="fas fa-keyboard"></i> Game Ketik</a></li>
+                <li id="adminNav" style="display: none;"><a href="#" id="navDashboard">Dashboard</a></li>
+<li id="komunitasNavContainer" style="display: none;">
+    <a href="#" id="navKomunitas" style="position: relative;">
+        <i class="fas fa-users"></i> Komunitas
+        <span id="chatNotifBadge" class="chat-notif-badge" style="display: none;">0</span>
+    </a>
+</li>
+                <li><a href="#" id="navProfil"><i class="fas fa-user-circle"></i> Profil</a></li>
+                <li><button class="btn-login" id="loginBtn">Logout</button></li>
+            </ul>
+        </nav>
+
+        <header class="hero" id="heroSection">
+            <div class="hero-content">
+                <h1>Jelajahi Dunia Melalui Kata</h1>
+                <p>Akses buku digital, jurnal, dan literatur dari berbagai genre dengan antarmuka yang modern dan nyaman.</p>
+                
+                <div class="slider-container">
+                    <div class="slider-track">
+                        <img src="https://media.istockphoto.com/id/1453081662/id/foto/toko-buku-di-pusat-kota-lisbon.jpg?b=1&s=1024x1024&w=0&k=20&c=41nTVGux-R-Dle7O9nR3LFF9D2DZ9bX6llJKvotv8yI=" alt="Perpustakaan 1" class="slide-img">
+                        <img src="https://cdn.pixabay.com/photo/2017/01/25/11/36/books-2007660_960_720.jpg" alt="Perpustakaan 2" class="slide-img">
+                        <img src="https://png.pngtree.com/thumb_back/fh260/background/20240913/pngtree-stack-of-books-in-a-library-with-blurred-bookshelves-background-image_16181415.jpg" alt="Perpustakaan 3" class="slide-img">
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <div id="adminDashboard" class="admin-dashboard" style="display: none;">
+            <div class="dashboard-header">
+                <h2>Admin Dashboard</h2>
+                <p style="color: #1e293b;">Pantau statistik perpustakaan, aktivitas pengguna, dan grafik secara real-time.</p>
+            </div>
+            
+            <div class="dashboard-grid">
+                <div class="stat-card" style="background: linear-gradient(135deg, #eff6ff, #dbeafe); border-left: 5px solid #3b82f6;">
+                    <div class="stat-info">
+                        <div class="stat-title">TOTAL KOLEKSI</div>
+                        <div class="stat-value" id="totalBooksCard">0</div>
+                    </div>
+                    <i class="fas fa-book stat-icon" style="color: #3b82f6;"></i>
+                </div>
+                <div class="stat-card" style="background: linear-gradient(135deg, #ecfdf5, #d1fae5); border-left: 5px solid #10b981;">
+                    <div class="stat-info">
+                        <div class="stat-title">SEDANG DIPINJAM</div>
+                        <div class="stat-value" id="totalPinjamCard">0</div>
+                    </div>
+                    <i class="fas fa-hand-holding-heart stat-icon" style="color: #10b981;"></i>
+                </div>
+                <div class="stat-card" style="background: linear-gradient(135deg, #fef3c7, #fde68a); border-left: 5px solid #f59e0b;">
+                    <div class="stat-info">
+                        <div class="stat-title">TOTAL PENGGUNA</div>
+                        <div class="stat-value" id="totalUsersCard">0</div>
+                    </div>
+                    <i class="fas fa-users stat-icon" style="color: #f59e0b;"></i>
+                </div>
+                <div class="stat-card" style="background: linear-gradient(135deg, #fee2e2, #fecaca); border-left: 5px solid #ef4444;">
+                    <div class="stat-info">
+                        <div class="stat-title">TOTAL ULASAN</div>
+                        <div class="stat-value" id="totalReviewsCard">0</div>
+                    </div>
+                    <i class="fas fa-star stat-icon" style="color: #ef4444;"></i>
+                </div>
+            </div>
+
+            <div class="admin-table-container">
+                <h3 style="color: #1e40af; margin-bottom: 1rem;"><i class="fas fa-history"></i> Log Peminjaman Terbaru</h3>
+                <div style="overflow-x: auto;">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>Nama Peminjam</th>
+                                <th>Judul Buku</th>
+                                <th>Waktu Peminjaman</th>
+                            </tr>
+                        </thead>
+                        <tbody id="recentBorrowsTable">
+                            <tr><td colspan="3" style="text-align: center; color: #64748b;">Memuat data...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="charts-grid">
+               <div class="chart-wrapper">
+                    <h3 style="margin-bottom: 1rem; color: #334155;"><i class="fas fa-landmark" style="color: #10b981;"></i> Peminjaman Sejarah</h3>
+                    <div class="chart-container-new"><canvas id="sejarahChart"></canvas></div>
+                </div>
+                <div class="chart-wrapper">
+                    <h3 style="margin-bottom: 1rem; color: #334155;"><i class="fas fa-flask" style="color: #f59e0b;"></i> Peminjaman Sains</h3>
+                    <div class="chart-container-new"><canvas id="sainsChart"></canvas></div>
+                </div>
+                <div class="chart-wrapper">
+                    <h3 style="margin-bottom: 1rem; color: #334155;"><i class="fas fa-magic" style="color: #3b82f6;"></i> Peminjaman Fiksi</h3>
+                    <div class="chart-container-new"><canvas id="fiksiChart"></canvas></div>
+                </div>
+            </div> 
+
+            <div class="admin-management-box" style="background: #ffffff; padding: 2.5rem; border-radius: 12px; border: 1px solid #cbd5e1; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-top: 2rem;">
+                <h3 id="formAdminTitle" style="color: #1e40af; margin-bottom: 1.5rem;"><i class="fas fa-plus-circle"></i> Tambah Koleksi Buku Baru</h3>
+                <form id="adminBookForm" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                    <input type="hidden" id="adminBookId">
+                    <div class="input-group-admin" style="grid-column: span 2 / auto;">
+                        <label style="font-weight: 600; font-size: 0.9rem; display: block; margin-bottom: 5px;">Judul Buku</label>
+                        <input type="text" id="adminBookTitle" placeholder="Masukkan judul buku..." style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px;" required>
+                    </div>
+                    <div class="input-group-admin">
+                        <label style="font-weight: 600; font-size: 0.9rem; display: block; margin-bottom: 5px;">Penulis / Pengarang</label>
+                        <input type="text" id="adminBookAuthor" placeholder="Nama penulis..." style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px;" required>
+                    </div>
+                    <div class="input-group-admin">
+                        <label style="font-weight: 600; font-size: 0.9rem; display: block; margin-bottom: 5px;">Kategori</label>
+                        <select id="adminBookCategory" style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; background: white;" required>
+                            <option value="fiksi">Fiksi</option>
+                            <option value="sejarah">Sejarah</option>
+                            <option value="sains">Sains</option>
+                        </select>
+                    </div>
+                    <div class="input-group-admin" style="grid-column: span 2 / auto;">
+                        <label style="font-weight: 600; font-size: 0.9rem; display: block; margin-bottom: 5px;">URL Gambar Sampul (Image URL)</label>
+                        <input type="url" id="adminBookImage" placeholder="https://example.com/gambar.jpg" style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px;" required>
+                    </div>
+                    <div class="input-group-admin" style="grid-column: span 2 / auto;">
+                        <label style="font-weight: 600; font-size: 0.9rem; display: block; margin-bottom: 5px;">Sinopsis Buku</label>
+                        <textarea id="adminBookSynopsis" placeholder="Tulis ringkasan alur cerita atau deskripsi singkat buku..." style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; height: 80px; resize: none;" required></textarea>
+                    </div>
+                    <div style="grid-column: span 2 / auto; display: flex; gap: 10px; margin-top: 10px;">
+                        <button type="submit" id="btnAdminSubmit" class="btn-submit" style="background: #1e40af; margin: 0; width: auto; padding: 10px 25px;"><i class="fas fa-save"></i> Simpan Buku</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <main class="container" id="homeView">
+            <h2 style="color: #0f172a; margin-bottom: 1.5rem; text-align: center;">Buku Populer Bulan Ini</h2>
+            <div class="book-grid" id="popularBookGrid"></div>
+        </main>
+
+        <main class="container" id="katalogView" style="display: none;">
+            <h2 style="color: #0f172a; margin-bottom: 1.5rem; text-align: center;">Katalog Lengkap</h2>
+            <div class="categories">
+                <button class="filter-btn active" data-filter="all">Semua</button>
+                <button class="filter-btn" data-filter="fiksi">Fiksi</button>
+                <button class="filter-btn" data-filter="sejarah">Sejarah</button>
+                <button class="filter-btn" data-filter="sains">Sains</button>
+            </div>
+            <div class="book-grid" id="katalogBookGrid"></div>
+        </main>
+
+        <main class="container" id="bukuSayaView" style="display: none;">
+            <h2 style="color: #0f172a; margin-bottom: 1.5rem; text-align: center;">Buku Pinjaman Saya</h2>
+            <div class="book-grid" id="bukuSayaGrid"></div>
+        </main>
+
+        <main class="container" id="keranjangView" style="display: none;">
+            <h2 style="color: #0f172a; margin-bottom: 1.5rem; text-align: center;">Keranjang Peminjaman</h2>
+           <div style="background: #ffffff; border: 1px solid #cbd5e1; padding: 1.5rem; border-radius: 12px; margin-bottom: 2rem; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
+                <h3 style="color: #e11d48; margin-bottom: 0.8rem; font-size: 1.1rem;"><i class="fas fa-exclamation-triangle"></i> Peraturan & Ketentuan Peminjaman</h3>
+                <ul style="color: #334155; margin-left: 1.5rem; line-height: 1.8; font-size: 0.95rem;">
+                    <li>Batas waktu peminjaman buku adalah <strong>7 hari</strong> terhitung sejak hari ini.</li>
+                    <li>Keterlambatan pengembalian akan dikenakan denda sebesar <strong style="color: #e11d48;">Rp 2.000 / hari</strong> per buku.</li>
+                    <li>Dengan menekan tombol Pinjam, Anda menyetujui seluruh ketentuan perpustakaan.</li>
+                <ul style="color: #334155; margin-left: 1.5rem; line-height: 1.8; font-size: 0.95rem;">
+    <li>Batas maksimal peminjaman adalah <strong>3 buku</strong> sekaligus untuk setiap pengguna.</li>
+    
+    <li>Batas waktu peminjaman buku adalah <strong>7 hari</strong> terhitung sejak hari ini.</li>
+    <li>Keterlambatan pengembalian akan dikenakan denda sebesar <strong style="color: #e11d48;">Rp 2.000 / hari</strong> per buku.</li>
+    <li>Dengan menekan tombol Pinjam, Anda menyetujui seluruh ketentuan perpustakaan.</li>
+                </ul>
+            </div>
+            <div class="book-grid" id="keranjangGrid"></div>
+            <div style="text-align: right; margin-top: 2rem; border-top: 1px solid #cbd5e1; padding-top: 1.5rem;">
+                <button id="btnCheckout" class="btn-submit" style="width: auto; padding: 1rem 2.5rem; font-size: 1.1rem; background: #1e40af;"><i class="fas fa-check-circle"></i> Saya Setuju & Pinjam Semua</button>
+            </div>
+        </main>
+
+        <main class="container" id="gameView" style="display: none;">
+            <h2 style="color: #0f172a; margin-bottom: 1.5rem; text-align: center;"><i class="fas fa-keyboard" style="color: #3b82f6;"></i> Speed Typing Test</h2>
+            
+            <div class="game-container">
+                <div class="game-stats">
+                    <div>Waktu: <span id="timeDisplay" style="color: #ef4444;">60</span>s</div>
+                    <div>Kecepatan: <span id="wpmDisplay">0</span> WPM</div>
+                    <div>Akurasi: <span id="accuracyDisplay">100</span>%</div>
+                </div>
+                
+                <div id="textToType" class="text-to-type">
+                    Tingkatkan fokusmu. Tekan "Mulai Game" untuk memunculkan teks dan bersiap mengetik secepat mungkin!
+                </div>
+                
+                <textarea id="typingInput" placeholder="Ketik di sini secepat mungkin..." disabled></textarea>
+                <button id="btnStartGame" class="btn-submit" style="background: #10b981; max-width: 200px; margin: 20px auto 0;">Mulai Game</button>
+            </div>
+            
+            <h3 style="color: #1e40af; margin-top: 4rem; text-align: center;"><i class="fas fa-trophy" style="color:#f59e0b;"></i> Global Leaderboard</h3>
+            <div id="leaderboardGrid" class="leaderboard-container">
+                <p style="padding: 2rem; text-align:center; color:#64748b;">Memuat data juara...</p>
+            </div>
+        </main>
+
+        <main class="container" id="komunitasView" style="display: none;">
+            <h2 style="color: #0f172a; margin-bottom: 1.5rem; text-align: center;">Komunitas Pembaca</h2>
+            
+            <div class="search-container" style="margin: 0 auto 2.5rem; max-width: 550px; width: 100%;">
+                <i class="fas fa-search"></i>
+                <input type="text" id="searchUserInput" placeholder="Cari teman berdasarkan nama (minimal 3 huruf)..." style="width: 100%; border: 2px solid #cbd5e1; padding: 0.8rem 1rem 0.8rem 2.8rem; font-size: 1rem;">
+            </div>
+            <div id="searchUserResults" class="book-grid" style="margin-bottom: 3rem;"></div>
+
+            <div id="friendRequestsSection" style="display: none; margin-bottom: 3rem;">
+                <div style="border-bottom: 2px solid #fca5a5; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 10px;">
+                    <i class="fas fa-bell" style="color: #ef4444; font-size: 1.5rem;"></i>
+                    <h3 style="color: #ef4444; margin: 0; padding-bottom: 0.5rem;">Permintaan Pertemanan</h3>
+                </div>
+                <div id="friendRequestsGrid" class="book-grid"></div>
+            </div>
+
+            <div style="border-bottom: 2px solid #e2e8f0; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 10px;">
+                <i class="fas fa-user-friends" style="color: #1e40af; font-size: 1.5rem;"></i>
+                <h3 style="color: #1e40af; margin: 0; padding-bottom: 0.5rem;">Daftar Teman Saya</h3>
+            </div>
+            <div id="myFriendsGrid" class="book-grid"></div>
+        </main>
+
+        <main class="container" id="profilView" style="display: none;">
+            <h2 style="color: #0f172a; margin-bottom: 1.5rem; text-align: center;">Profil Pengguna</h2>
+            
+            <div class="profile-card">
+                <div class="profile-avatar-container">
+                    <img id="profileAvatar" src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=80" alt="Foto Profil">
+                </div>
+                
+                <div class="profile-header-info">
+                    <h2 id="profileNameDisplay">Nama Pengguna</h2>
+                    <div id="profileRoleBadge" class="role-badge">User</div>
+                </div>
+
+                <form id="profileForm" class="profile-form">
+                    <div class="form-grid">
+                        <div class="input-group-admin">
+                            <label>Nama Lengkap / Username</label>
+                            <input type="text" id="profileName" required>
+                        </div>
+                        <div class="input-group-admin">
+                            <label>Usia (Tahun)</label>
+                            <input type="number" id="profileAge" min="1">
+                        </div>
+                        <div class="input-group-admin">
+                            <label>Asal Kota</label>
+                            <input type="text" id="profileCity">
+                        </div>
+                        <div class="input-group-admin">
+                            <label>Jenis Kelamin</label>
+                            <select id="profileGender" style="background: white;">
+                                <option value="">Pilih...</option>
+                                <option value="Laki-laki">Laki-laki</option>
+                                <option value="Perempuan">Perempuan</option>
+                            </select>
+                        </div>
+                        <div class="input-group-admin" style="grid-column: span 2 / auto;">
+                            <label><i class="fas fa-upload"></i> Upload Foto (Dari Galeri/Perangkat)</label>
+                            <input type="file" id="profileAvatarUpload" accept="image/*" style="background: white; cursor: pointer;">
+                        </div>
+                        <div class="input-group-admin" style="grid-column: span 2 / auto;">
+                            <label><i class="fas fa-link"></i> ATAU Gunakan URL Gambar</label>
+                            <input type="url" id="profileAvatarUrl" placeholder="https://example.com/foto.jpg">
+                        </div>
+                        <div class="input-group-admin" style="grid-column: span 2 / auto;">
+                            <label>Bio Singkat</label>
+                            <textarea id="profileBio" placeholder="Ceritakan sedikit tentang dirimu..." style="height: 70px; resize: none;"></textarea>
+                        </div>
+                    </div>
+                    <button type="submit" id="btnSaveProfile" class="btn-submit" style="background: #1e40af; margin-top: 15px; width: auto; padding: 10px 25px;">
+                        <i class="fas fa-save"></i> Simpan Perubahan
+                    </button>
+                </form>
+            </div>
+        </main>
+
+        <div id="returnModal" class="modal">
+            <div class="modal-content">
+                <span class="close-btn" id="closeReturnModal">&times;</span>
+                <h2 style="color: #10b981;">Proses Pengembalian</h2>
+                <div id="returnDetails" style="text-align: left; background: #f8fafc; padding: 1.2rem; border-radius: 8px; margin-bottom: 1.5rem; color: #334155; line-height: 1.6; border: 1px solid #e2e8f0;"></div>
+                <button id="confirmReturnBtn" class="btn-submit" style="background: #10b981;">Selesaikan Pengembalian</button>
+            </div>
+        </div>
+
+        <div id="bookDetailModal" class="modal">
+            <div class="modal-content" style="max-width: 600px; text-align: left;">
+                <span class="close-btn" id="closeDetailModal">&times;</span>
+                <div id="detailContent"></div>
+                <hr style="margin: 1.5rem 0; border: 0; border-top: 1px solid #e2e8f0;">
+                
+                <h3>Komentar & Rating</h3>
+                <div id="commentsList" style="max-height: 250px; overflow-y: auto; margin-bottom: 1rem; padding-right: 10px;"></div>
+
+                <div class="rating-input" style="margin-bottom: 1rem;">
+                    <p style="font-size: 0.9rem; font-weight: 600; margin-bottom: 0.5rem;">Berikan Rating Anda:</p>
+                    <div id="starInput" style="color: #fbbf24; font-size: 1.5rem; cursor: pointer;">
+                        <i class="far fa-star" data-value="1"></i>
+                        <i class="far fa-star" data-value="2"></i>
+                        <i class="far fa-star" data-value="3"></i>
+                        <i class="far fa-star" data-value="4"></i>
+                        <i class="far fa-star" data-value="5"></i>
+                    </div>
+                </div>
+                <textarea id="commentInput" placeholder="Tulis pendapatmu tentang buku ini..." style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #cbd5e1; resize: none; height: 80px;"></textarea>
+                <button id="submitCommentBtn" class="btn-submit" style="background: #1e40af; margin-top: 10px;">Kirim Ulasan</button>
+            </div>
+        </div>
+
+        <div id="friendProfileModal" class="modal">
+            <div class="modal-content" style="max-width: 450px; text-align: center;">
+                <span class="close-btn" id="closeFriendProfileModal">&times;</span>
+                <div class="profile-avatar-container" style="margin: 0 auto 1rem; width: 100px; height: 100px;">
+                    <img id="fpAvatar" src="" alt="Foto Profil">
+                </div>
+                <h2 id="fpName" style="margin-bottom: 0.2rem; color: #0f172a;">Nama User</h2>
+                <div id="fpRole" class="role-badge" style="margin-bottom: 1.5rem;">User</div>
+                
+                <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 1.2rem; text-align: left; margin-bottom: 1rem;">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; font-size: 0.9rem;">
+                        <div><i class="fas fa-calendar-alt" style="color: #64748b;"></i> <b>Usia:</b> <span id="fpAge"></span></div>
+                        <div><i class="fas fa-venus-mars" style="color: #64748b;"></i> <b>Gender:</b> <span id="fpGender"></span></div>
+                        <div style="grid-column: 1 / -1;"><i class="fas fa-map-marker-alt" style="color: #64748b;"></i> <b>Kota:</b> <span id="fpCity"></span></div>
+                    </div>
+                    <hr style="border: 0; border-top: 1px solid #cbd5e1; margin: 10px 0;">
+                    <div style="font-size: 0.9rem;">
+                        <b style="color: #334155;"><i class="fas fa-info-circle" style="color: #64748b;"></i> Bio:</b>
+                        <p id="fpBio" style="color: #475569; margin-top: 5px; line-height: 1.5;"></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="chatModal" class="modal">
+            <div class="modal-content" style="max-width: 500px; padding: 0; display: flex; flex-direction: column; height: 80vh; overflow: hidden; background: #f8fafc; border-radius: 15px;">
+                <div style="background: #1e40af; color: white; padding: 1rem 1.5rem; display: flex; justify-content: space-between; align-items: center;">
+                    <h3 id="chatFriendName" style="margin:0; font-size: 1.2rem; color: white;"><i class="fas fa-comments"></i> Chat</h3>
+                    <span class="close-btn" id="closeChatModal" style="color: white; position: static; cursor: pointer;">&times;</span>
+                </div>
+                <div id="chatMessages" style="flex: 1; overflow-y: auto; padding: 1.5rem; display: flex; flex-direction: column; gap: 10px;"></div>
+                <div style="padding: 1rem; background: white; border-top: 1px solid #e2e8f0; display: flex; gap: 10px;">
+                    <input type="text" id="chatInput" placeholder="Ketik pesan..." style="flex: 1; padding: 12px 15px; border-radius: 25px; border: 1px solid #cbd5e1; outline: none; font-family: inherit;">
+                    <button id="sendChatBtn" class="btn-submit" style="width: 45px; height: 45px; margin: 0; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: #1e40af;">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div id="successModal" class="modal">
+            <div class="modal-content" style="max-width: 380px; text-align: center; padding: 2.5rem;">
+                <div class="checkbox-wrapper" style="margin-bottom: 1.5rem; display: flex; justify-content: center;">
+                    <label class="container">
+                        <input type="checkbox" id="animatedCheck" disabled>
+                        <div class="checkmark"></div>
+                    </label>
+                </div>
+                <h2 style="color: #10b981; margin-bottom: 0.5rem; font-size: 1.6rem;">Peminjaman Selesai!</h2>
+                <p style="color: #475569; font-size: 0.95rem; line-height: 1.6; margin-bottom: 1.8rem;">
+                    Buku berhasil dipinjam. Kamu akan segera dialihkan ke halaman <b>Buku Saya</b> untuk meninjau tenggat waktu pengembalian.
+                </p>
+                <button onclick="closeSuccessModal()" class="btn-submit" style="background: #10b981; margin-top: 0; width: 100%;">
+                    Buka Buku Saya
+                </button>
+            </div>
+        </div>
+
+        <footer class="site-footer">
+            <div class="footer-container">
+                <div class="footer-about">
+                    <h3><i class="fas fa-book-open"></i> Jendela Dunia</h3>
+                    <p>Platform e-library premium yang menyediakan akses ke ribuan buku digital, jurnal, dan literatur dari berbagai genre untuk menemani setiap perjalanan membacamu.</p>
+                </div>
+                <div class="footer-contact">
+                    <h3>Hubungi Kami</h3>
+                    <ul class="contact-list">
+                        <li><a href="https://instagram.com/aeell_el" target="_blank"><i class="fab fa-instagram"></i> @aeell_el</a></li>
+                        <li><a href="mailto:rafhaelalmeric1@gmail.com"><i class="fas fa-envelope"></i> rafhaelalmeric1@gmail.com</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 Jendela Dunia. Hak Cipta Dilindungi.</p>
+            </div>
+        </footer>
+
+    </div> 
+    
+    <div id="toast" class="toast">Buku berhasil dipinjam!</div>
+
+    <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-auth-compat.js"></script> 
+    <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore-compat.js"></script>
+
+    <script src="script.js"></script>
+</body>
+</html>
